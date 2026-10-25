@@ -10,6 +10,7 @@
    assets/logo-color.png        full colour    (footer / brand moments)
    assets/logo-mark.png         the "31" mark  (top bar, favicon source)
    assets/reel.mp4              hero film (muted, 2560x1440, 60fps)
+   assets/reel-1080.mp4         hero film fallback (1920x1080, 60fps)
    assets/reel-poster.jpg       film poster / first frame
    assets/case-wrench/01–07.jpg impact wrench campaign
    assets/case-laser/01–08.jpg  laser level campaign
@@ -2000,6 +2001,16 @@ svg{display:block}
     if (!heroVideo || !hero) return;
 
     var heroMedia = heroVideo.closest('.hero-media');
+
+    /* 1440p60 is too much for some embedded browsers — start them on 1080p */
+    var FALLBACK = 'assets/reel-1080.mp4';
+    var ua = navigator.userAgent || '';
+    if (/Quark|MicroMessenger|MQQBrowser|UCBrowser|HuaweiBrowser/i.test(ua)) {
+      var uaSrc = heroVideo.querySelector('source');
+      if (uaSrc) uaSrc.parentNode.removeChild(uaSrc);
+      heroVideo.src = FALLBACK;
+    }
+
     var earlyDone = false;
     var revealed = false;
     var armed = false;   /* loader has lifted */
@@ -2035,6 +2046,48 @@ svg{display:block}
       var pr = heroVideo.play();
       if (pr && pr.catch) pr.catch(function () {});
     }
+
+    /* -------------------------------------------------------
+       decode fallback — some browsers cannot play 1440p60.
+       if the picture freezes while the clock runs, drop to 1080p
+       and keep the same position.
+       ------------------------------------------------------- */
+    var swapped = false;
+    var lastT = -1;
+    var stuck = 0;
+
+    function swapToFallback() {
+      if (swapped) return;
+      swapped = true;
+      var t = heroVideo.currentTime || 0;
+      var srcEl = heroVideo.querySelector('source');
+      if (srcEl) srcEl.parentNode.removeChild(srcEl);
+      heroVideo.setAttribute('preload', 'auto');
+      heroVideo.src = FALLBACK;
+      heroVideo.load();
+      heroVideo.addEventListener('loadeddata', function () {
+        try { heroVideo.currentTime = t; } catch (e) {}
+        var pr = heroVideo.play();
+        if (pr && pr.catch) pr.catch(function () {});
+      }, { once: true });
+    }
+
+    heroVideo.addEventListener('error', swapToFallback);
+
+    window.setInterval(function () {
+      if (swapped || !began || heroVideo.paused || heroVideo.ended) {
+        stuck = 0;
+        lastT = heroVideo.currentTime;
+        return;
+      }
+      if (heroVideo.currentTime === lastT) {
+        stuck++;
+        if (stuck >= 3) swapToFallback();
+      } else {
+        stuck = 0;
+        lastT = heroVideo.currentTime;
+      }
+    }, 900);
 
     heroVideo.addEventListener('playing', function () {
       heroMedia.classList.add('video-ready');

@@ -5,15 +5,17 @@
   ---------------------------------------------------------------------
   FILES
    assets/logo-white.png        white lockup   (dark surfaces)
-   assets/logo-dark.png         ink lockup     (beige loader)
+   assets/logo-dark.png         ink lockup     (loader, revealed)
+   assets/logo-white-sil.png    white silhouette (loader, before the sweep)
    assets/logo-color.png        full colour    (footer / brand moments)
    assets/logo-mark.png         the "31" mark  (top bar, favicon source)
-   assets/reel.mp4              hero film (muted, 1080p)
+   assets/reel.mp4              hero film (muted, 2560x1440, 60fps)
    assets/reel-poster.jpg       film poster / first frame
    assets/case-wrench/01–07.jpg impact wrench campaign
    assets/case-laser/01–08.jpg  laser level campaign
    assets/case-washer/01–08.jpg pressure washer campaign
    assets/hero-saturday.jpg     illustration
+   assets/feature-animode.jpg   featured plate (Animode)
 
   TO CUSTOMISE
    1. Swap the case images, keep the file names (01.jpg … 08.jpg).
@@ -21,7 +23,7 @@
    3. Replace hello@example.com.
    4. Index rows: data-img="…" drives the hover preview.
    5. The hero film starts when the loader lifts; the copy enters at 5.4s
-      and switches to reversed type at 8.2s (see the hero film script).
+      and switches to reversed type at 8.4s (see the hero film script).
   =====================================================================
 -->
 <html lang="en">
@@ -381,34 +383,69 @@ svg{display:block}
 }
 .loader-logo{position:relative;width:min(560px,72vw)}
 .loader-logo img{
-  width:100%;height:auto;
-  clip-path:inset(0 0 0 0);
-  filter:drop-shadow(0 14px 30px rgba(20,22,16,.14));
-  animation:logoIn 1s .1s var(--ease) both;
+  width:100%;height:auto;display:block;
+  filter:drop-shadow(0 14px 30px rgba(20,22,16,.12));
+  -webkit-user-select:none;user-select:none;
 }
-@keyframes logoIn{
+.loader-logo .lg-base{
+  opacity:.2;
+  clip-path:inset(0 100% 0 0);
+  animation:baseWipe 1s .1s var(--ease) forwards;
+}
+@keyframes baseWipe{
+  from{clip-path:inset(0 100% 0 0)}
+  to{clip-path:inset(0 0 0 0)}
+}
+.loader-logo .lg-color{
+  position:absolute;inset:0;
+  clip-path:inset(0 100% 0 0);
+  animation:logoReveal 1.25s .35s var(--ease) forwards;
+}
+@keyframes logoReveal{
   from{clip-path:inset(0 100% 0 0)}
   to{clip-path:inset(0 0 0 0)}
 }
 .loader-logo .scanbar{
-  position:absolute;top:-8%;bottom:-8%;width:2px;left:0;
-  background:linear-gradient(180deg,transparent,rgba(20,22,16,.7),transparent);
-  box-shadow:0 0 18px 2px rgba(20,22,16,.25);
-  animation:sweep 1.3s .35s var(--ease) forwards;
+  position:absolute;top:-12%;bottom:-12%;width:3px;left:0;
+  border-radius:2px;
+  background:#b8e04a;
+  box-shadow:
+    0 0 0 1px rgba(184,224,74,.6),
+    0 0 16px 3px rgba(184,224,74,.6),
+    0 0 52px 14px rgba(184,224,74,.3);
+  animation:sweep 1.25s .35s var(--ease) forwards;
   opacity:0;
 }
 @keyframes sweep{
   0%{left:0;opacity:0}
-  15%{opacity:1}
-  85%{opacity:1}
+  10%{opacity:1}
+  70%{opacity:1}
   100%{left:100%;opacity:0}
 }
 .loader-sub{color:rgba(20,22,16,.55);font-size:9px;letter-spacing:.34em}
 
 .loader-meter{position:relative;z-index:2;display:flex;align-items:center;gap:16px;margin-bottom:14px}
 .loader-meter .mono{color:rgba(20,22,16,.72);font-variant-numeric:tabular-nums}
-.l-bar{flex:1;height:1px;background:rgba(20,22,16,.18);overflow:hidden}
-.l-bar i{display:block;height:100%;width:100%;background:#1b1d15;transform:scaleX(0);transform-origin:left;transition:transform .18s linear}
+.l-count{display:inline-flex;align-items:flex-start;gap:3px}
+.l-pct{
+  font-family:var(--font-m);font-size:12px;line-height:1;letter-spacing:.04em;
+  color:rgba(20,22,16,.55);margin-top:11px;
+}
+.l-bar{
+  position:relative;flex:1;height:5px;border-radius:99px;
+  background:
+    repeating-linear-gradient(90deg,rgba(20,22,16,.14) 0 1px,transparent 1px 14px),
+    rgba(20,22,16,.1);
+  box-shadow:inset 0 0 0 1px rgba(20,22,16,.16);
+  overflow:hidden;
+}
+.l-bar i{
+  display:block;height:100%;width:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--olive),var(--orange) 70%,#f6c25a);
+  box-shadow:0 0 14px rgba(237,160,44,.6),0 0 2px rgba(255,255,255,.4) inset;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .18s linear;
+}
 .loader-num{font-family:var(--font-d);font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:-.03em;color:#15170f;min-width:3.6ch}
 .loader-row{font-size:9px}
 
@@ -974,7 +1011,14 @@ svg{display:block}
   padding:clamp(6px,1vw,12px) 0 clamp(20px,3vw,32px);
 }
 .case-desc{font-size:13.5px;line-height:1.75;color:var(--dim);max-width:52ch}
-.case-intro .specs{margin:0;border-top:1px solid var(--line-soft)}
+.case-intro .specs{
+  margin:0;padding:16px 18px;
+  border:1px solid var(--line);border-radius:12px;
+  background:linear-gradient(160deg,rgba(242,236,220,.06),rgba(242,236,220,.01) 50%,rgba(242,236,220,.04)),rgba(9,11,8,.35);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);
+  backdrop-filter:blur(16px) saturate(120%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
 
 .case-stack{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
@@ -995,11 +1039,71 @@ svg{display:block}
 }
 
 /* ============================================================
-   16 · contact sheet
+   15d · featured plate
    ============================================================ */
+.acard{
+  position:relative;
+  padding:18px 18px 14px;
+  background:
+    linear-gradient(160deg,rgba(242,236,220,.10),rgba(242,236,220,.02) 46%,rgba(242,236,220,.05)),
+    rgba(9,11,8,.42);
+  border:1px solid rgba(242,236,220,.16);
+  border-radius:14px;
+  -webkit-backdrop-filter:blur(22px) saturate(130%);
+  backdrop-filter:blur(22px) saturate(130%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 70px -40px rgba(0,0,0,.9);
+}
+.acard-top{display:flex;align-items:center;gap:10px}
+.acard-mark{font-family:var(--font-d);font-size:26px;line-height:1;color:var(--orange)}
+.acard-brand{display:flex;flex-direction:column;line-height:1.1;flex:1}
+.acard-brand b{font-family:var(--font-d);font-size:12px;letter-spacing:.02em}
+.acard-brand .mono{font-size:7px;letter-spacing:.24em;color:var(--mute);margin-top:3px}
+.acard-vol{color:var(--orange);font-size:8px}
+.acard-rule{height:1px;background:linear-gradient(90deg,rgba(242,236,220,.3),transparent);margin:12px 0}
+.acard-rows{display:flex;flex-direction:column;gap:8px}
+.acard-rows>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.acard-rows span{color:var(--mute);font-family:var(--font-m);font-size:8px;letter-spacing:.18em;text-transform:uppercase}
+.acard-rows b{font-weight:400;font-size:12px;color:var(--dim)}
+.acard-bar{height:2px;background:rgba(242,236,220,.12);margin:14px 0 10px;overflow:hidden}
+.acard-bar span{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--olive),var(--orange))}
+.acard-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--mute);font-size:7px}
+.acard-bars{width:60px;height:11px;background:repeating-linear-gradient(90deg,rgba(242,236,220,.65) 0 1px,transparent 1px 3px)}
+
+/* works header + its card */
+
+.plate{
+  position:relative;
+  padding:clamp(46px,6vw,88px) 0 clamp(30px,4vw,54px);
+  border-top:1px solid var(--line);
+}
+.plate-head{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:0 var(--pad);margin-bottom:clamp(16px,2.2vw,26px);
+}
+.plate-fig{position:relative;margin:0;overflow:hidden;background:#0d0f0a}
+.plate-fig img{
+  display:block;width:100%;height:min(88vh,880px);object-fit:cover;
+  transition:transform 6s var(--ease);
+}
+.plate-fig:hover img{transform:scale(1.02)}
+.plate-fig::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(9,11,8,.28),transparent 26%,transparent 52%,rgba(9,11,8,.62));
+}
+.plate-card{
+  position:absolute;z-index:2;left:var(--pad);bottom:clamp(18px,3vw,40px);
+  width:min(430px,42vw);
+  background-color:rgba(9,11,8,.62);
+}
+.plate-card .plate-title{font-size:clamp(1.8rem,3.4vw,3rem);line-height:.95;margin:12px 0 8px}
+.plate-card .plate-desc{font-size:12.5px;line-height:1.7;color:var(--dim);margin:0 0 14px}
+@media (max-width:900px){
+  .plate-fig img{height:min(58vh,520px)}
+  .plate-card{position:static;width:auto;margin:16px var(--pad) 0}
+}
+
 /* ============================================================
    16 · contact sheet
-   ============================================================ */
    ============================================================ */
 .sheet{position:relative;height:360vh;background:rgba(11,13,8,.4);border-bottom:1px solid var(--line)}
 .sheet::before{
@@ -1246,14 +1350,15 @@ svg{display:block}
 
   <div class="loader-center">
     <div class="loader-logo">
-      <img src="assets/logo-dark.png" alt="NOVIW31 — The Sweet Dream">
+      <img class="lg-base" src="assets/logo-white-sil.png" alt="NOVIW31 — The Sweet Dream">
+      <img class="lg-color" src="assets/logo-dark.png" alt="" aria-hidden="true">
       <span class="scanbar"></span>
     </div>
     <p class="mono loader-sub">Special access content · 2021—2026</p>
   </div>
 
   <div class="loader-meter">
-    <span class="mono loader-num" id="lNum">000</span>
+    <span class="l-count"><span class="mono loader-num" id="lNum">000</span><span class="l-pct">%</span></span>
     <div class="l-bar"><i id="lBar"></i></div>
     <span class="mono">100</span>
   </div>
@@ -1621,6 +1726,39 @@ svg{display:block}
     </div>
   </section>
 
+  <!-- ===================== featured plate ===================== -->
+  <section class="plate" id="feature">
+    <div class="plate-head">
+      <div class="sec-marker mono">
+        <span class="num">[ 05 ]</span>
+        <span>Featured</span>
+        <span class="rule"></span>
+        <span>Single plate · 2026</span>
+      </div>
+    </div>
+
+    <figure class="plate-fig">
+      <img src="assets/feature-animode.jpg" alt="Isometric 3D AI factory: neon AI letters, robotic arms and a translucent Animode cube">
+      <figcaption class="acard plate-card">
+        <div class="acard-top">
+          <span class="acard-mark">31</span>
+          <span class="acard-brand"><b>NOVIW31</b><span class="mono">Featured plate</span></span>
+          <span class="acard-vol mono">2026</span>
+        </div>
+        <h2 class="disp plate-title">Animode</h2>
+        <p class="plate-desc">An isometric AI factory staged as one continuous set — neon signage, robotic arms and a translucent Animode cube at the centre of the machine floor.</p>
+        <div class="acard-rule"></div>
+        <div class="acard-rows">
+          <div><span>Role</span><b>3D / Art direction</b></div>
+          <div><span>Format</span><b>Key visual</b></div>
+          <div><span>Year</span><b>2026</b></div>
+        </div>
+        <div class="acard-bar"><span style="width:56%"></span></div>
+        <div class="acard-foot"><span class="mono">RL—09</span><span class="acard-bars" aria-hidden="true"></span><span class="mono">[ 05 ]</span></div>
+      </figcaption>
+    </figure>
+  </section>
+
 </main>
 
 <!-- ===================== footer ===================== -->
@@ -1628,7 +1766,7 @@ svg{display:block}
   <div class="hazard f-hazard" aria-hidden="true"></div>
   <div class="f-top">
     <div class="sec-marker mono">
-      <span class="num">[ 05 ]</span>
+      <span class="num">[ 06 ]</span>
       <span>End of file</span>
     </div>
     <span class="chip mono"><i class="led"></i>Open for commissions</span>
@@ -1756,7 +1894,7 @@ svg{display:block}
     var decoded = Promise.all(images.map(function (img) {
       return img.decode ? img.decode().catch(function () {}) : Promise.resolve();
     }));
-    var minWait = new Promise(function (r) { window.setTimeout(r, 1050); });
+    var minWait = new Promise(function (r) { window.setTimeout(r, 1750); });
     var cap = new Promise(function (r) { window.setTimeout(r, 2400); });
 
     Promise.race([Promise.all([decoded, minWait]), cap]).then(function () {
@@ -1905,7 +2043,7 @@ svg{display:block}
     /* ink copy over the white intro, then switch as the film goes dark */
     heroVideo.addEventListener('timeupdate', function () {
       var t = heroVideo.currentTime;
-      if (t >= 8.2) reveal();
+      if (t >= 8.4) reveal();
       else if (t >= 5.4) early();
     });
     heroVideo.addEventListener('ended', reveal);
